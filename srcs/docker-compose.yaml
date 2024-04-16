@@ -1,0 +1,98 @@
+version: "3.5"
+
+services:
+  nginx:
+    container_name: nginx
+    build: ./requirements/nginx
+    ports:
+      - "443:443"
+    volumes:
+      - wordpress_data:/usr/share/wordpress/
+    depends_on:
+      - wordpress
+    networks:
+      - wp
+#    restart: on-failure:10
+
+  mariadb:
+    container_name: mariadb
+    build: requirements/mariadb
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - wp
+#    restart: on-failure:10
+
+  wordpress:
+    container_name: wordpress
+    build: ./requirements/wordpress
+    volumes:
+      - wordpress_data:/usr/share/wordpress
+    depends_on:
+      - mariadb
+    networks:
+      - wp
+#    env_file:
+#      - .env
+#    restart: on-failure:10
+
+  redis:
+    container_name: redis
+    build: ./bonuses/redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - wordpress_data:/usr/share/wordpress
+    depends_on:
+      - wordpress
+    networks:
+      - wp
+    env_file:
+      - .env
+
+  ftp:
+    container_name: ftp
+    build: ./bonuses/ftp
+    ports:
+      - "21:21"
+    volumes:
+      - wordpress_data:/usr/share/wordpress
+    networks:
+      - wp
+
+  adminer:
+    container_name: adminer
+    build: ./bonuses/adminer
+    depends_on:
+      - mariadb
+    ports:
+      - "8080:8080"
+    networks:
+      - wp
+
+  static-web-page:
+    container_name: static-web-page
+    build: ./bonuses/static-web-page
+    depends_on:
+      - nginx
+    networks:
+      - wp
+
+
+volumes:
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/urosby/Documents/inception/data/wordpress_data
+      o: bind
+  db_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/urosby/Documents/inception/data/db_data
+      o: bind
+
+networks:
+  wp:
+    name: wp

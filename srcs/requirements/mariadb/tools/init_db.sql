@@ -1,0 +1,10 @@
+CREATE DATABASE IF NOT EXISTS wordpress;
+CREATE USER IF NOT EXISTS 'urosby'@'%' IDENTIFIED BY '666';
+GRANT ALL PRIVILEGES ON wordpress.* TO 'urosby'@'%';
+FLUSH PRIVILEGES;
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'urosby666';
+
+CREATE USER IF NOT EXISTS 'anti-urosby'@'%' IDENTIFIED BY '123';
+GRANT ALL PRIVILEGES ON wordpress.* TO 'anti-urosby'@'%';
+FLUSH PRIVILEGES;
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'anti-urosby666';
